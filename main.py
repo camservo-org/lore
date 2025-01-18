@@ -14,11 +14,12 @@ from app.NPC import NPC
 load_dotenv()
 PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# Initialize Flask app
 
 app = Flask(__name__)
 
 # --- DATABASE SETUP ---
+## TODO: Run migrations if database hasn't been used before.
+## TODO: Allow for remote connections.
 DATABASE_URL = "sqlite:///mud_game.db"  # Replace with PostgreSQL URL if needed
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
@@ -26,16 +27,6 @@ SessionLocal = sessionmaker(bind=engine)
 
 # Create tables
 Base.metadata.create_all(bind=engine)
-
-# --- VECTOR INDEX SETUP ---
-# PERSIST_DIR = "./storage"
-# if os.path.exists(PERSIST_DIR):
-#     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-#     vector_index = load_index_from_storage(storage_context)
-# else:
-#     vector_index = VectorStoreIndex([])
-
-# --- API ROUTES ---
 
 
 @app.route("/create_region", methods=["POST"])
@@ -106,6 +97,5 @@ def get_npcs():
     )
 
 
-# --- MAIN ENTRY POINT ---
 if __name__ == "__main__":
     app.run(debug=True)
