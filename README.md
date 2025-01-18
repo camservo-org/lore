@@ -14,7 +14,7 @@ If anyone is interested in helping me, or setting me straight about how to work 
 2. Run migrations `alembic upgrade head`
 
 ## API Endpoints
-- Create Regions: `curl -X POST http://127.0.0.1:5000/generate_lore -H "Content-Type: application/json" -d '{"prompt": "Describe a region like feudal japan"}'`
+- Create Regions: `curl -X POST http://127.0.0.1:5000/create_region -H "Content-Type: application/json" -d '{"description": "Describe a new region in a fantasy world.  Make it be themed high fantasy.  Somewhat tolkienish.  Be creative."}''`
 - Create NPC: `curl -X POST http://127.0.0.1:5000/add_npc -H "Content-Type: application/json" -d '{"description": "The local merchant.  Hes kinda weird and shady.", "location": "Mystic Tower", "generate_backstory": true}'`
 - Query NPC: `curl -X GET http://127.0.0.1:5000/get_npcs`
 - Query realm lore: `curl -X GET "http://127.0.0.1:5000/query_lore?query=what%20regions%20are%20there"`
