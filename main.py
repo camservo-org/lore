@@ -2,16 +2,13 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
-from llama_index.core import (
-    Document,
-    StorageContext,
-    VectorStoreIndex,
-    load_index_from_storage,
-)
+from llama_index.core import (Document, StorageContext, VectorStoreIndex,
+                              load_index_from_storage)
 from sqlalchemy import Column, Integer, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+from app.LoreManager import LoreManager
 from app.NPC import NPC
 
 load_dotenv()
@@ -31,41 +28,32 @@ SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 # --- VECTOR INDEX SETUP ---
-PERSIST_DIR = "./storage"
-if os.path.exists(PERSIST_DIR):
-    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-    vector_index = load_index_from_storage(storage_context)
-else:
-    vector_index = VectorStoreIndex([])
+# PERSIST_DIR = "./storage"
+# if os.path.exists(PERSIST_DIR):
+#     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
+#     vector_index = load_index_from_storage(storage_context)
+# else:
+#     vector_index = VectorStoreIndex([])
 
 # --- API ROUTES ---
 
 
-@app.route("/generate_lore", methods=["POST"])
-def generate_lore():
-    print("TESTS")
-    """Generate lore using ChatGPT and save it locally."""
+@app.route("/create_region", methods=["POST"])
+def create_region():
     data = request.json
-    prompt = data.get("prompt", "Describe a new region in the MUD world.")
-
-    # Call ChatGPT (mocked here)
-    lore = f"Generated lore for prompt: {prompt}"
-
-    doc = Document(text=lore)
-
-    vector_index.insert(doc)
-    vector_index.storage_context.persist(persist_dir="./storage")
-
-    return jsonify({"message": "Lore generated and saved.", "lore": lore})
+    description = data.get("description", "")
+    manager = LoreManager("./storage", api_key=OPENAI_API_KEY)
+    manager.create_region(description)
+    return jsonify({})
 
 
 @app.route("/query_lore", methods=["GET"])
 def query_lore():
-    """Query the vector index for lore."""
-    query = "What regions exists and what can you tell me about them?"
-    query_engine = vector_index.as_query_engine()
-    response = query_engine.query(query)
-    return jsonify({"query": query, "response": response.response})
+    ## TODO: Make this an actual query passed in.
+    manager = LoreManager("./storage", api_key=OPENAI_API_KEY)
+    response = manager.query_lore("Can you describe some of the regions?")
+    print(type(response))
+    return jsonify({"response": response})
 
 
 @app.route("/add_npc", methods=["POST"])
